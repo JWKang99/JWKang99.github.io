@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://jwkang99.github.io/"/>
-  <updated>2020-03-06T13:27:45.088Z</updated>
+  <updated>2020-03-06T13:29:06.703Z</updated>
   <id>https://jwkang99.github.io/</id>
   
   <author>
@@ -15,41 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>HTTP范围请求</title>
-    <link href="https://jwkang99.github.io/posts/b1fd81d6.html"/>
-    <id>https://jwkang99.github.io/posts/b1fd81d6.html</id>
-    <published>2020-07-10T09:10:36.725Z</published>
-    <updated>2020-03-06T13:27:45.088Z</updated>
-    
-    <content type="html"><![CDATA[<p>​        人们下载文件时断网重连之后，需要一种可恢复的机制。所谓恢复是指能从之前下载中断处恢复下载。</p><p>​        要实现该功能需要指定下载的实体范围。像这样，指定范围发送的请求叫做范围请求（Range Request）。基于范围请求也可实现多线程分片下载。</p><p>​        只有双端（客户端和服务器端）都支持HTTP/1.1才能使用范围请求。</p><h4 id="1-范围请求的请求报文"><a href="#1-范围请求的请求报文" class="headerlink" title="1.范围请求的请求报文"></a>1.范围请求的请求报文</h4><p>​        在HTTP/1.1的请求报文中，有一个首部字段<code>Range</code>来指定请求资源的byte范围。</p><p>范围请求报文示例：</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">xml</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /tip.jpg HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Range: bytes =5001-10000</span><br></pre></td></tr></table></figure></div><p>想要继续下载后边的字节在请求头加<code>Ranges:bytes=10000-</code>即可。</p><p>​        byte范围指定形式如下：</p><ul><li>5001-10000：指定开始和结束的范围</li><li>5001- ：指定开始区间，表示从5001字节之后的所有内容</li><li>-3000：指定结束区间，表示从一开始到3000字节</li><li>-3000, 5001-：表示多重范围</li></ul><h4 id="2-范围请求的响应报文"><a href="#2-范围请求的响应报文" class="headerlink" title="2.范围请求的响应报文"></a>2.范围请求的响应报文</h4><p>​        针对范围请求，通过响应头<code>Accept-Ranges:bytes</code>表示当前资源支持范围请求，响应会返回状态码为<code>206 Partial Content</code>的响应报文。针对请求报文中的Range字段，响应报文中也又响应的字段<code>Content-Range</code>来标记响应的实体内容范围。</p><p>范围请求的响应报文示例：</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">xml</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 206 Partial Content</span><br><span class="line">Date: Fri, 13 Jul 2019 17:38:17 GMT</span><br><span class="line">Content-Range: bytes 5001-10000/10000</span><br><span class="line">Content-Length: 5000</span><br><span class="line">Content-Type: image/jpeg</span><br></pre></td></tr></table></figure></div><p>​        <code>Content-Range</code>字段的格式如上，首先表示单位是byte，然后表明本次响应的实体长度，和所请求资源的总长度，上例则表示本次响应了从5001到10000字节的图片，该图片的总大小为10000字节。而<code>Content-Length</code>表示的是此次响应的实体内容长度。</p><p>​        <strong>另外，</strong>对于多重范围请求，响应会在首部字段<code>Content-Type</code>标明<code>multipart/byteranges</code>后返回响应报文。</p><p>​        如果服务器不安无法响应范围请求，则会返回状态码200 OK和完整的实体内容。</p><h4 id="3-请求失效"><a href="#3-请求失效" class="headerlink" title="3.请求失效"></a>3.请求失效</h4><p>​        在下载文件时暂停，继续时从头开始。可能时http请求失效了，也有可能是所请求的资源在这个过程中发生了变化，比如后台开发者更新了这个图片。如果下载的过程中服务器端资源更新了，而下载的URL没有变，如果能够继续下载，下载完成之后就可能出现两部分不能正确拼接的错误情况。</p><p>​        在HTTP协议中，响应报文可以通过<code>ETag</code>字段或者<code>Last-Modified</code>字段标识资源是否更新。请求报文则使用<code>If-Range</code>字段把<code>ETag</code>字段或者<code>Last-Modified</code>字段的内容复制即可。</p><p>​        如果两次操作都是同一个资源，则返回206，并继续后续操作。否则则返回200，重新开始下载。</p><a href="/posts/b1fd81d6/164c57b24948a9a2.jpg" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/b1fd81d6/164c57b24948a9a2.jpg" class="lazyload"></a><p>（内容参考《图解HTTP》和<a href="https://www.cnblogs.com/plokmju/p/http_range.html）" target="_blank" rel="noopener">https://www.cnblogs.com/plokmju/p/http_range.html）</a></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;​        人们下载文件时断网重连之后，需要一种可恢复的机制。所谓恢复是指能从之前下载中断处恢复下载。&lt;/p&gt;
-&lt;p&gt;​        要实现该功能需要指定下载的实体范围。像这样，指定范围发送的请求叫做范围请求（Range Request）。基于范围请求也可实现多线程
-      
-    
-    </summary>
-    
-    
-      <category term="基础知识" scheme="https://jwkang99.github.io/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/"/>
-    
-      <category term="http" scheme="https://jwkang99.github.io/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/http/"/>
-    
-    
-      <category term="知识记录" scheme="https://jwkang99.github.io/tags/%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95/"/>
-    
-      <category term="http" scheme="https://jwkang99.github.io/tags/http/"/>
-    
-      <category term="范围请求" scheme="https://jwkang99.github.io/tags/%E8%8C%83%E5%9B%B4%E8%AF%B7%E6%B1%82/"/>
-    
-      <category term="断点续传" scheme="https://jwkang99.github.io/tags/%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0/"/>
-    
-  </entry>
   
   <entry>
     <title>Spring学习笔记</title>
@@ -430,6 +395,41 @@
     
     
       <category term="设计模式" scheme="https://jwkang99.github.io/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>HTTP范围请求</title>
+    <link href="https://jwkang99.github.io/posts/b1fd81d6.html"/>
+    <id>https://jwkang99.github.io/posts/b1fd81d6.html</id>
+    <published>2019-10-12T16:00:00.000Z</published>
+    <updated>2020-07-10T09:46:34.705Z</updated>
+    
+    <content type="html"><![CDATA[<p>​        人们下载文件时断网重连之后，需要一种可恢复的机制。所谓恢复是指能从之前下载中断处恢复下载。</p><p>​        要实现该功能需要指定下载的实体范围。像这样，指定范围发送的请求叫做范围请求（Range Request）。基于范围请求也可实现多线程分片下载。</p><p>​        只有双端（客户端和服务器端）都支持HTTP/1.1才能使用范围请求。</p><h4 id="1-范围请求的请求报文"><a href="#1-范围请求的请求报文" class="headerlink" title="1.范围请求的请求报文"></a>1.范围请求的请求报文</h4><p>​        在HTTP/1.1的请求报文中，有一个首部字段<code>Range</code>来指定请求资源的byte范围。</p><p>范围请求报文示例：</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">xml</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GET /tip.jpg HTTP/1.1</span><br><span class="line">Host: www.baidu.com</span><br><span class="line">Range: bytes =5001-10000</span><br></pre></td></tr></table></figure></div><p>想要继续下载后边的字节在请求头加<code>Ranges:bytes=10000-</code>即可。</p><p>​        byte范围指定形式如下：</p><ul><li>5001-10000：指定开始和结束的范围</li><li>5001- ：指定开始区间，表示从5001字节之后的所有内容</li><li>-3000：指定结束区间，表示从一开始到3000字节</li><li>-3000, 5001-：表示多重范围</li></ul><h4 id="2-范围请求的响应报文"><a href="#2-范围请求的响应报文" class="headerlink" title="2.范围请求的响应报文"></a>2.范围请求的响应报文</h4><p>​        针对范围请求，通过响应头<code>Accept-Ranges:bytes</code>表示当前资源支持范围请求，响应会返回状态码为<code>206 Partial Content</code>的响应报文。针对请求报文中的Range字段，响应报文中也又响应的字段<code>Content-Range</code>来标记响应的实体内容范围。</p><p>范围请求的响应报文示例：</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">xml</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 206 Partial Content</span><br><span class="line">Date: Fri, 13 Jul 2019 17:38:17 GMT</span><br><span class="line">Content-Range: bytes 5001-10000/10000</span><br><span class="line">Content-Length: 5000</span><br><span class="line">Content-Type: image/jpeg</span><br></pre></td></tr></table></figure></div><p>​        <code>Content-Range</code>字段的格式如上，首先表示单位是byte，然后表明本次响应的实体长度，和所请求资源的总长度，上例则表示本次响应了从5001到10000字节的图片，该图片的总大小为10000字节。而<code>Content-Length</code>表示的是此次响应的实体内容长度。</p><p>​        <strong>另外，</strong>对于多重范围请求，响应会在首部字段<code>Content-Type</code>标明<code>multipart/byteranges</code>后返回响应报文。</p><p>​        如果服务器不安无法响应范围请求，则会返回状态码200 OK和完整的实体内容。</p><h4 id="3-请求失效"><a href="#3-请求失效" class="headerlink" title="3.请求失效"></a>3.请求失效</h4><p>​        在下载文件时暂停，继续时从头开始。可能时http请求失效了，也有可能是所请求的资源在这个过程中发生了变化，比如后台开发者更新了这个图片。如果下载的过程中服务器端资源更新了，而下载的URL没有变，如果能够继续下载，下载完成之后就可能出现两部分不能正确拼接的错误情况。</p><p>​        在HTTP协议中，响应报文可以通过<code>ETag</code>字段或者<code>Last-Modified</code>字段标识资源是否更新。请求报文则使用<code>If-Range</code>字段把<code>ETag</code>字段或者<code>Last-Modified</code>字段的内容复制即可。</p><p>​        如果两次操作都是同一个资源，则返回206，并继续后续操作。否则则返回200，重新开始下载。</p><p><a href="/posts/b1fd81d6/164c57b24948a9a2.jpg" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/b1fd81d6/164c57b24948a9a2.jpg" class="lazyload"></a></p><p>（内容参考《图解HTTP》和<a href="https://www.cnblogs.com/plokmju/p/http_range.html）" target="_blank" rel="noopener">https://www.cnblogs.com/plokmju/p/http_range.html）</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;​        人们下载文件时断网重连之后，需要一种可恢复的机制。所谓恢复是指能从之前下载中断处恢复下载。&lt;/p&gt;
+&lt;p&gt;​        要实现该功能需要指定下载的实体范围。像这样，指定范围发送的请求叫做范围请求（Range Request）。基于范围请求也可实现多线程
+      
+    
+    </summary>
+    
+    
+      <category term="基础知识" scheme="https://jwkang99.github.io/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/"/>
+    
+      <category term="http" scheme="https://jwkang99.github.io/categories/%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/http/"/>
+    
+    
+      <category term="知识记录" scheme="https://jwkang99.github.io/tags/%E7%9F%A5%E8%AF%86%E8%AE%B0%E5%BD%95/"/>
+    
+      <category term="http" scheme="https://jwkang99.github.io/tags/http/"/>
+    
+      <category term="范围请求" scheme="https://jwkang99.github.io/tags/%E8%8C%83%E5%9B%B4%E8%AF%B7%E6%B1%82/"/>
+    
+      <category term="断点续传" scheme="https://jwkang99.github.io/tags/%E6%96%AD%E7%82%B9%E7%BB%AD%E4%BC%A0/"/>
     
   </entry>
   
