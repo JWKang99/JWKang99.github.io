@@ -76,6 +76,37 @@
   </entry>
   
   <entry>
+    <title>Minor/Major/Full GC</title>
+    <link href="https://jwkang99.github.io/posts/13c7dd67.html"/>
+    <id>https://jwkang99.github.io/posts/13c7dd67.html</id>
+    <published>2021-05-16T02:02:48.000Z</published>
+    <updated>2021-06-21T09:49:40.993Z</updated>
+    
+    <content type="html"><![CDATA[<p>对象的内存分配是在java堆上分配（也可能经过JIT编译后被拆散为标量间接分配在栈上），主要分配子新生代的Eden区，如果启动了本地线程分配缓冲，将按线程优先再TLAB上分配，少数情况直接分配在老年代。</p><p><a href="/posts/13c7dd67/generation.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/13c7dd67/generation.png" class="lazyload"></a></p><p>下边主要阐述Serial/Serial Old组合下的内存分配和回收策略。</p><p><strong>对象在新生代Eden区分配</strong>，若Eden没有足够空间，触发Minor GC</p><p><strong>Minor GC</strong>（因为有对象复制移动，stop-the-world）</p><p>发生在新生代，将From和Eden区存活的对象<strong>复制到To区域</strong>，当To区域不足以存放所有存活的对象时，通过老年代的<strong>内存担保</strong>，To区域放不下的存活对象<strong>提前</strong>进入老年代。</p><p><strong>大对象直接进入老年代</strong></p><p>通过参数了-XX：PretenureSizeThreshold设置大于指定大小的对象直接分配到老年代，避免在新生代产生大量复制大对象的操作。注：该参数只对Serial和ParNew两种新生代收集器有效。</p><p><strong>大龄对象进入老年代</strong></p><p>通过参数-XX： MaxTenuringThreshold（默认15）设置进入老年代年龄。对象在Eden区分配后，经历一次Minor GC年龄加1。</p><p><strong>动态判定对象年龄</strong></p><p>当Survivor区（From/To）中相同年龄的对象大小总和达到了Survivor的一半，<strong>大于等于</strong>该年龄的对象<strong>提前</strong>进入老年代。</p><p><strong>空间分配担保</strong></p><p>老年代会给新生代的回收座内存担保。<br>在Minor GC之前，</p><p>若老年代可用连续内存<strong>大于</strong>新生代所有对象总和，则<strong>Minor GC安全</strong>。<br>若老年代可用连续内存不能容纳所有新生代所有对象，则可能担保失败（即新生代放不下的存活对象在老年代也放不下，可能要丢弃）。</p><p>此时若虚拟机<strong>不允许担保失败</strong>，则进行一次Full GC。<br>若虚拟机<strong>允许担保失败</strong>，则检查每次从新生代转移到老年代对象的平均大小，若能放下，尝试Minor GC（失败后仍触发Full GC），若放不下触发Full GC。</p><p><strong>JDK6之后不再使用是否允许担保失败的参数</strong>。若老年代连续可用空间大于新生代对象总和或历次晋升的平均值，则触发Minor GC，否则Full GC。</p><p><strong>Full GC</strong></p><p>回收整个java堆，通常由Minor GC担保失败后触发，Full GC通常会包含一次Minor GC。</p><p><strong>Major GC</strong></p><p>CMS收集器中，当老年代满时会触发 Major GC。目前，只有CMS收集器会有单独收集老年代的行为。其他收集器均无此行为。针对新生代（主要指Eden区）的Minor GC 比较常见，各个收集器均支持。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;对象的内存分配是在java堆上分配（也可能经过JIT编译后被拆散为标量间接分配在栈上），主要分配子新生代的Eden区，如果启动了本地线程分配缓冲，将按线程优先再TLAB上分配，少数情况直接分配在老年代。&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/posts/13c7dd67/gen
+      
+    
+    </summary>
+    
+    
+      <category term="uncategorized" scheme="https://jwkang99.github.io/categories/uncategorized/"/>
+    
+    
+      <category term="jvm" scheme="https://jwkang99.github.io/tags/jvm/"/>
+    
+      <category term="GC" scheme="https://jwkang99.github.io/tags/GC/"/>
+    
+      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
     <title>JVM判断对象是否可回收</title>
     <link href="https://jwkang99.github.io/posts/d51b6e9c.html"/>
     <id>https://jwkang99.github.io/posts/d51b6e9c.html</id>
@@ -150,37 +181,6 @@
       
         &lt;p&gt;java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;程序计数器、本地方法栈、虚拟机栈&lt;/strong&gt;是&lt;strong&gt;线程&lt;/strong&gt;私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作
-      
-    
-    </summary>
-    
-    
-      <category term="jvm" scheme="https://jwkang99.github.io/categories/jvm/"/>
-    
-    
-      <category term="jvm" scheme="https://jwkang99.github.io/tags/jvm/"/>
-    
-      <category term="GC" scheme="https://jwkang99.github.io/tags/GC/"/>
-    
-      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Minor/Major/Full GC</title>
-    <link href="https://jwkang99.github.io/posts/13c7dd67.html"/>
-    <id>https://jwkang99.github.io/posts/13c7dd67.html</id>
-    <published>2021-05-16T02:02:48.000Z</published>
-    <updated>2021-06-21T09:49:18.498Z</updated>
-    
-    <content type="html"><![CDATA[<p>对象的内存分配是在java堆上分配（也可能经过JIT编译后被拆散为标量间接分配在栈上），主要分配子新生代的Eden区，如果启动了本地线程分配缓冲，将按线程优先再TLAB上分配，少数情况直接分配在老年代。</p><p><a href="/posts/13c7dd67/generation.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/13c7dd67/generation.png" class="lazyload"></a></p><p>下边主要阐述Serial/Serial Old组合下的内存分配和回收策略。</p><p><strong>对象在新生代Eden区分配</strong>，若Eden没有足够空间，触发Minor GC</p><p><strong>Minor GC</strong>（因为有对象复制移动，stop-the-world）</p><p>发生在新生代，将From和Eden区存活的对象<strong>复制到To区域</strong>，当To区域不足以存放所有存活的对象时，通过老年代的<strong>内存担保</strong>，To区域放不下的存活对象<strong>提前</strong>进入老年代。</p><p><strong>大对象直接进入老年代</strong></p><p>通过参数了-XX：PretenureSizeThreshold设置大于指定大小的对象直接分配到老年代，避免在新生代产生大量复制大对象的操作。注：该参数只对Serial和ParNew两种新生代收集器有效。</p><p><strong>大龄对象进入老年代</strong></p><p>通过参数-XX： MaxTenuringThreshold（默认15）设置进入老年代年龄。对象在Eden区分配后，经历一次Minor GC年龄加1。</p><p><strong>动态判定对象年龄</strong></p><p>当Survivor区（From/To）中相同年龄的对象大小总和达到了Survivor的一半，<strong>大于等于</strong>该年龄的对象<strong>提前</strong>进入老年代。</p><p><strong>空间分配担保</strong></p><p>老年代会给新生代的回收座内存担保。<br>在Minor GC之前，</p><p>若老年代可用连续内存<strong>大于</strong>新生代所有对象总和，则<strong>Minor GC安全</strong>。<br>若老年代可用连续内存不能容纳所有新生代所有对象，则可能担保失败（即新生代放不下的存活对象在老年代也放不下，可能要丢弃）。</p><p>此时若虚拟机<strong>不允许担保失败</strong>，则进行一次Full GC。<br>若虚拟机<strong>允许担保失败</strong>，则检查每次从新生代转移到老年代对象的平均大小，若能放下，尝试Minor GC（失败后仍触发Full GC），若放不下触发Full GC。</p><p><strong>JDK6之后不再使用是否允许担保失败的参数</strong>。若老年代连续可用空间大于新生代对象总和或历次晋升的平均值，则触发Minor GC，否则Full GC。</p><p><strong>Full GC</strong></p><p>回收整个java堆，通常由Minor GC担保失败后触发，Full GC通常会包含一次Minor GC。</p><p><strong>Major GC</strong></p><p>CMS收集器中，当老年代满时会触发 Major GC。目前，只有CMS收集器会有单独收集老年代的行为。其他收集器均无此行为。针对新生代（主要指Eden区）的Minor GC 比较常见，各个收集器均支持。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;对象的内存分配是在java堆上分配（也可能经过JIT编译后被拆散为标量间接分配在栈上），主要分配子新生代的Eden区，如果启动了本地线程分配缓冲，将按线程优先再TLAB上分配，少数情况直接分配在老年代。&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;/posts/13c7dd67/gen
       
     
     </summary>
