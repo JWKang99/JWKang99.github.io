@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://jwkang99.github.io/"/>
-  <updated>2021-06-20T15:11:13.310Z</updated>
+  <updated>2021-06-28T13:51:56.629Z</updated>
   <id>https://jwkang99.github.io/</id>
   
   <author>
@@ -17,31 +17,30 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>字节笔试0613</title>
-    <link href="https://jwkang99.github.io/posts/c3e2d5b.html"/>
-    <id>https://jwkang99.github.io/posts/c3e2d5b.html</id>
-    <published>2021-06-13T11:02:48.000Z</published>
-    <updated>2021-06-20T15:11:13.310Z</updated>
+    <title>String.intern()方法</title>
+    <link href="https://jwkang99.github.io/posts/5e74123b.html"/>
+    <id>https://jwkang99.github.io/posts/5e74123b.html</id>
+    <published>2021-06-28T03:20:15.000Z</published>
+    <updated>2021-06-28T13:51:56.629Z</updated>
     
-    <content type="html"><![CDATA[<h5 id="3道编程题"><a href="#3道编程题" class="headerlink" title="3道编程题"></a>3道编程题</h5><ol><li>二叉树最大权值和</li></ol><p>给定一颗具有n节点的完全二叉树， 需要从这棵树中选择一部分节点，求其 最大权值和。</p><p>规则：如果选择了一个节点的任意子节点，则不可以选择这个节点。求这部分节点的数字和最大值。</p><ol><li>感染人群</li></ol><p>求给定N个人被感染和人与人之间的接触关系下，可以覆盖所有被感染人群，且人数最少的最优 路径。</p><ol><li>座位安排</li></ol><p>给定人数情况下，求座位数；</p><p>规则：不能有两个人挨着坐，每个人都按照观察最长连续空座位，然后选中间那个位子坐（如果有多个满足需求则取左边个）。</p>]]></content>
+    <content type="html"><![CDATA[<p>之前了解过String.intern()，有点忘记了，在《深入理解JAVA虚拟机》中再次看到，记录一下。</p><p>JDK1.6主要有以下几条规则。</p><h4 id="1、new-String-是在堆上创建对象"><a href="#1、new-String-是在堆上创建对象" class="headerlink" title="1、new String()是在堆上创建对象"></a>1、new String()是在堆上创建对象</h4><p><a href="/posts/5e74123b/1.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/5e74123b/1.png" class="lazyload"></a></p><p><a href="/posts/5e74123b/2.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/5e74123b/2.png" class="lazyload"></a></p><h4 id="2、通过字面量创建字符串"><a href="#2、通过字面量创建字符串" class="headerlink" title="2、通过字面量创建字符串"></a>2、通过字面量创建字符串</h4><p>例如String str = “twm”， 首先查找常量池中是否存在相同的字符串，若存在，返回该字符串的引用；若不存在，将该字符串添加到常量池，在返回其引用。</p><p><a href="/posts/5e74123b/3.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/5e74123b/3.png" class="lazyload"></a></p><h4 id="3、字符串常量拼接"><a href="#3、字符串常量拼接" class="headerlink" title="3、字符串常量拼接"></a>3、字符串常量拼接</h4><p>字符串常量+操作，在编译阶段就会直接被合为同一个字符串。例如，String str = “JA”+”VA”，编译阶段会合并成String str = “JAVA”。从而和第2种创建方式一致。</p><h4 id="4、final字段"><a href="#4、final字段" class="headerlink" title="4、final字段"></a>4、final字段</h4><p>对于final字段，编译期直接进行了常量替换</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">java</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> String str1 = <span class="string">"JA"</span>;</span><br><span class="line"><span class="keyword">final</span> String str2 = <span class="string">"VA"</span>;</span><br><span class="line">String str3 = str1 + str2;</span><br></pre></td></tr></table></figure></div><p>在编译时，直接替换成了String str3=”JA”+”VA”，根据第三条规则，再次替换成String str3=”JAVA”。</p><h4 id="5、常量和变量拼接"><a href="#5、常量和变量拼接" class="headerlink" title="5、常量和变量拼接"></a>5、常量和变量拼接</h4><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">java</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String baseStr = <span class="keyword">new</span> String(<span class="string">"JAVA"</span>);</span><br><span class="line">String str3 = baseStr + <span class="string">"01"</span>;</span><br></pre></td></tr></table></figure></div><p>会调用stringBuilder.append()在堆上创建新的对象。</p><h4 id="6、JDK7的不同之处"><a href="#6、JDK7的不同之处" class="headerlink" title="6、JDK7的不同之处"></a>6、JDK7的不同之处</h4><p>JDK7的String.intern()方法还是会先在常量池中寻找是否已经存在，若存在    则返回常量池中的引用。不同的是，若常量池中不存在，则再将字符串复制常量池中，而是将其在堆中的地址复制到常量池中。</p><p><a href="/posts/5e74123b/4.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/5e74123b/4.png" class="lazyload"></a></p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">java</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String str2 = <span class="keyword">new</span> String(<span class="string">"str"</span>)+<span class="keyword">new</span> String(<span class="string">"01"</span>);</span><br><span class="line">str2.intern();</span><br><span class="line">String str1 = <span class="string">"str01"</span>;</span><br><span class="line">System.out.println(str2==str1);</span><br></pre></td></tr></table></figure></div><p>上述代码在JDK1.7上运行时打印出<strong>true</strong>，str1和str2指向同一个在堆中的String对象。<br>JDK1.6上运行时也打印出<strong>true</strong>，str1和str2指向常量池中的同一个字符串。</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">java</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">String str2 = <span class="keyword">new</span> String(<span class="string">"str"</span>)+<span class="keyword">new</span> String(<span class="string">"01"</span>);</span><br><span class="line">String str1 = <span class="string">"str01"</span>;</span><br><span class="line">str2.intern();</span><br><span class="line">System.out.println(str2==str1);</span><br></pre></td></tr></table></figure></div><p>上述代码在JDK1.7上运行时打印出<strong>false</strong>，str1指向常量池中的字符串，str2指向堆中的String对象。<br>JDK1.6上运行时打印出<strong>false</strong>，str1指向常量池中的字符串，str2指向堆中的String对象。</p>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;h5 id=&quot;3道编程题&quot;&gt;&lt;a href=&quot;#3道编程题&quot; class=&quot;headerlink&quot; title=&quot;3道编程题&quot;&gt;&lt;/a&gt;3道编程题&lt;/h5&gt;&lt;ol&gt;
-&lt;li&gt;二叉树最大权值和&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;给定一颗具有n节点的完全二叉树， 需要从这棵树中选择一部分
+        &lt;p&gt;之前了解过String.intern()，有点忘记了，在《深入理解JAVA虚拟机》中再次看到，记录一下。&lt;/p&gt;
+&lt;p&gt;JDK1.6主要有以下几条规则。&lt;/p&gt;
+&lt;h4 id=&quot;1、new-String-是在堆上创建对象&quot;&gt;&lt;a href=&quot;#1、new-String-是在
       
     
     </summary>
     
     
-      <category term="uncategorized" scheme="https://jwkang99.github.io/categories/uncategorized/"/>
+      <category term="java" scheme="https://jwkang99.github.io/categories/java/"/>
     
     
-      <category term="字节跳动" scheme="https://jwkang99.github.io/tags/%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8/"/>
+      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
     
   </entry>
   
@@ -80,9 +79,9 @@
     <link href="https://jwkang99.github.io/posts/e70d4d38.html"/>
     <id>https://jwkang99.github.io/posts/e70d4d38.html</id>
     <published>2021-05-17T02:02:48.000Z</published>
-    <updated>2021-06-21T14:39:32.055Z</updated>
+    <updated>2021-06-28T12:01:59.434Z</updated>
     
-    <content type="html"><![CDATA[<p>JVM将所管理的内存包括以下几个运行时数据区域。</p><p><a href="/posts/e70d4d38/java_area.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img style="zoom:70%" data-src="/posts/e70d4d38/java_area.png" class="lazyload"></a></p><h3 id="1-程序计数器"><a href="#1-程序计数器" class="headerlink" title="1. 程序计数器"></a>1. 程序计数器</h3><p>线程私有，用于指定当前线程正在执行的<strong>字节码指令地址</strong>，若执行的是本地方法，则计数器为空（Undefined），唯一一个没规定任何OutOfMemoryError（OOM）异常的区域。</p><h3 id="2-Java虚拟机栈"><a href="#2-Java虚拟机栈" class="headerlink" title="2. Java虚拟机栈"></a>2. Java虚拟机栈</h3><p>线程私有，与线程的生命周期相同，描述Java方法的执行。</p><p>每个方法的执行都会创建一个栈帧，存储<strong>局部变量表</strong>，操作数栈，方法出口等信息，一个方法从调用到执行完成，对应于一个栈帧入栈出栈的过程。</p><p><strong>局部变量表</strong>存放编译期可知的各种基本数据类型，对象的引用。局部变量表所需内存在编译期确定，运行时不变。</p><p> Java虚拟机栈存在StackOverflowError异常和OOM异常。如果线程请求的栈深度大于所允许的深度，抛出StackOverflowError异常；如果虚拟机栈可扩展，在扩展时没有足够内存，抛出OOM异常。</p><h3 id="3-本地方法栈"><a href="#3-本地方法栈" class="headerlink" title="3. 本地方法栈"></a>3. 本地方法栈</h3><p>与虚拟机栈作用类似，不过执行的是本地方法，同样会抛出StackOverflowError异常和OOM异常。</p><h3 id="4-Java堆"><a href="#4-Java堆" class="headerlink" title="4. Java堆"></a>4. Java堆</h3><p>线程共享，几乎所有的实例对象在这里分配内存，但是JIT编译器的发展使得可能间接的分配在栈上。堆也是垃圾收集的主要区域，分为新生代和老年代。</p><p><strong>注</strong>：堆上仍有可能划分出线程私有的分配缓冲区（TLAB），在TLAB分配的对象仍在堆中。</p><p>-Xms：Java堆初始分配大小     -Xmx：Java堆最大可分配大小</p><p>Java堆可以物理不连续，但要逻辑连续。</p><p>没有足够内存分配对象会抛出OOM异常。</p><h3 id="5-方法区"><a href="#5-方法区" class="headerlink" title="5.方法区"></a>5.方法区</h3><p>线程共享，存储虚拟机加载的<strong>类信息</strong>、<strong>常量</strong>、<strong>静态变量</strong>、<strong>即时编译器编译后的代码</strong>等数据。</p><p>方法区是堆了一个逻辑分区，但是应该与堆区分开来，JDK1.8之前使用永久代实现方法区，故被称为永久代（但是并不等价）。JDK1.8之后原本放在永久代的常量池、静态变量和类型信息被移除到元空间中。方法区用本地内存实现（Native Memory）。</p><p>方法区会抛出OOM异常。</p><p><strong>运行时常量池</strong>是方法区的一部分，Class文件中有常量池，用于存放编译期生成的各种字面量和符号引用，在类加载后着些内容会<strong>进入方法区的常量池</strong>。</p><p>注：String.intern()的应用很重要。</p><h3 id="6-直接内存"><a href="#6-直接内存" class="headerlink" title="6.直接内存"></a>6.直接内存</h3><p>直接内存<strong>不是</strong>虚拟机运行时数据区的一部分，也不是虚拟机定义的区域。</p><p>NIO中，将本地函数库分配在堆外，java堆中的DirectByteBuffer对象引用该内存进行操作，避免Java堆和Native堆来回复制。</p><p>因为是逻辑内存，可能存在设置参数信息不当，导致超出物理内存总和，抛出OOM异常。</p><h3 id="7-抛出OOM异常情景"><a href="#7-抛出OOM异常情景" class="headerlink" title="7. 抛出OOM异常情景"></a>7. 抛出OOM异常情景</h3><h4 id="①-java堆溢出"><a href="#①-java堆溢出" class="headerlink" title="① java堆溢出"></a>① java堆溢出</h4><p>不断创建对象，并且保证GC Roots到对象之间有引用（避免回收），达到最大限制就会抛出OOM异常。例如创建List，不断往List中添加对象。</p><p>内存溢出：实际就是报OOM异常并且进一步提示Java heap space</p><p>内存泄漏：指程序在申请内存后，无法释放已申请的内存空间。就是你向系统申请分配内存进行使用(new)，可是使用完了以后却不归还(delete)，结果你申请到的那块内存你自己也不能再访问（也许你把它的地址给弄丢了），而<strong>系统也不能再次将它分配给需要的程序</strong>。</p><h4 id="②-虚拟机栈和本地方法栈溢出"><a href="#②-虚拟机栈和本地方法栈溢出" class="headerlink" title="② 虚拟机栈和本地方法栈溢出"></a>② 虚拟机栈和本地方法栈溢出</h4><p>参数-Xss调整栈内存大小</p><p>StackOverflowError异常：如果线程请求的栈深度大于虚拟机所允许的最大深度。 OutOfMemoryError异常：如果虚拟机的栈内存允许动态扩展，扩展栈容量无法申请到足够的内存 。</p><p><strong>注</strong>：HotSpot虚拟机不支持扩展动态扩展栈大小，故栈区域运行时不会因为栈扩展你失败抛出OOM异常，只会因为栈无法容纳新的栈帧而抛出StackOverflowError异常。</p><p>触发StackOverflowError异常：</p><ul><li>递归调用不结束，栈深度增加</li><li>本地变量过多，导致栈帧过大</li></ul><p>触发OOM异常：</p><ul><li>不断创建不停止的线程，内存不够新建线程时，抛出OOM异常</li></ul><h4 id="③-方法区和运行时常量池溢出"><a href="#③-方法区和运行时常量池溢出" class="headerlink" title="③ 方法区和运行时常量池溢出"></a>③ 方法区和运行时常量池溢出</h4><p>场景：</p><ul><li><p>JDK7之前不断添加常量到常量池，限制方法区大小<code>String.valueOf(i++).intern()</code>就会导致运行时常量池OOM异常，并提示PermGen space。<br>JDK7及之后，字符串常量池被移至Java堆，限制方法区大小不会抛出上述异常，这时需要限制堆的大小。</p></li><li><p>运行时不断生成大量动态类（反射）</p></li></ul><h4 id="④-本机直接内存溢出"><a href="#④-本机直接内存溢出" class="headerlink" title="④  本机直接内存溢出"></a>④  本机直接内存溢出</h4>]]></content>
+    <content type="html"><![CDATA[<p>JVM将所管理的内存包括以下几个运行时数据区域。</p><p><a href="/posts/e70d4d38/java_area.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img style="zoom:70%" data-src="/posts/e70d4d38/java_area.png" class="lazyload"></a></p><h3 id="1-程序计数器"><a href="#1-程序计数器" class="headerlink" title="1. 程序计数器"></a>1. 程序计数器</h3><p>线程私有，用于指定当前线程正在执行的<strong>字节码指令地址</strong>，若执行的是本地方法，则计数器为空（Undefined），唯一一个没规定任何OutOfMemoryError（OOM）异常的区域。</p><h3 id="2-Java虚拟机栈"><a href="#2-Java虚拟机栈" class="headerlink" title="2. Java虚拟机栈"></a>2. Java虚拟机栈</h3><p>线程私有，与线程的生命周期相同，描述Java方法的执行。</p><p>每个方法的执行都会创建一个栈帧，存储<strong>局部变量表</strong>，操作数栈，方法出口等信息，一个方法从调用到执行完成，对应于一个栈帧入栈出栈的过程。</p><p><strong>局部变量表</strong>存放编译期可知的各种基本数据类型，对象的引用。局部变量表所需内存在编译期确定，运行时不变。</p><p> Java虚拟机栈存在StackOverflowError异常和OOM异常。如果线程请求的栈深度大于所允许的深度，抛出StackOverflowError异常；如果虚拟机栈可扩展，在扩展时没有足够内存，抛出OOM异常。</p><h3 id="3-本地方法栈"><a href="#3-本地方法栈" class="headerlink" title="3. 本地方法栈"></a>3. 本地方法栈</h3><p>与虚拟机栈作用类似，不过执行的是本地方法，同样会抛出StackOverflowError异常和OOM异常。</p><h3 id="4-Java堆"><a href="#4-Java堆" class="headerlink" title="4. Java堆"></a>4. Java堆</h3><p>线程共享，几乎所有的实例对象在这里分配内存，但是JIT编译器的发展使得可能间接的分配在栈上。堆也是垃圾收集的主要区域，分为新生代和老年代。</p><p><strong>注</strong>：堆上仍有可能划分出线程私有的分配缓冲区（TLAB），在TLAB分配的对象仍在堆中。</p><p>-Xms：Java堆初始分配大小     -Xmx：Java堆最大可分配大小</p><p>Java堆可以物理不连续，但要逻辑连续。</p><p>没有足够内存分配对象会抛出OOM异常。</p><h3 id="5-方法区"><a href="#5-方法区" class="headerlink" title="5.方法区"></a>5.方法区</h3><p>线程共享，存储虚拟机加载的<strong>类信息</strong>、<strong>常量</strong>、<strong>静态变量</strong>、<strong>即时编译器编译后的代码</strong>等数据。</p><p>方法区是堆了一个逻辑分区，但是应该与堆区分开来，JDK1.8之前使用永久代实现方法区，故被称为永久代（但是并不等价）。JDK1.8之后原本放在永久代的常量池、静态变量和类型信息被移除到元空间中。方法区用本地内存实现（Native Memory）。</p><p>方法区会抛出OOM异常。</p><p><strong>运行时常量池</strong>是方法区的一部分，Class文件中有常量池，用于存放编译期生成的各种字面量和符号引用，在类加载后着些内容会<strong>进入方法区的常量池</strong>。</p><p>注：String.intern()的应用很重要。</p><h3 id="6-直接内存"><a href="#6-直接内存" class="headerlink" title="6.直接内存"></a>6.直接内存</h3><p>直接内存<strong>不是</strong>虚拟机运行时数据区的一部分，也不是虚拟机定义的区域。</p><p>NIO中，将本地函数库分配在堆外，java堆中的DirectByteBuffer对象引用该内存进行操作，避免Java堆和Native堆来回复制。</p><p>因为是逻辑内存，可能存在设置参数信息不当，导致超出物理内存总和，抛出OOM异常。</p><h3 id="7-抛出OOM异常情景"><a href="#7-抛出OOM异常情景" class="headerlink" title="7. 抛出OOM异常情景"></a>7. 抛出OOM异常情景</h3><h4 id="①-java堆溢出"><a href="#①-java堆溢出" class="headerlink" title="① java堆溢出"></a>① java堆溢出</h4><p>不断创建对象，并且保证GC Roots到对象之间有引用（避免回收），达到最大限制就会抛出OOM异常。例如创建List，不断往List中添加对象。</p><p>内存溢出：实际就是报OOM异常并且进一步提示Java heap space</p><p>内存泄漏：指程序在申请内存后，无法释放已申请的内存空间。就是你向系统申请分配内存进行使用(new)，可是使用完了以后却不归还(delete)，结果你申请到的那块内存你自己也不能再访问（也许你把它的地址给弄丢了），而<strong>系统也不能再次将它分配给需要的程序</strong>。</p><h4 id="②-虚拟机栈和本地方法栈溢出"><a href="#②-虚拟机栈和本地方法栈溢出" class="headerlink" title="② 虚拟机栈和本地方法栈溢出"></a>② 虚拟机栈和本地方法栈溢出</h4><p>参数-Xss调整栈内存大小</p><p>StackOverflowError异常：如果线程请求的栈深度大于虚拟机所允许的最大深度。 OutOfMemoryError异常：如果虚拟机的栈内存允许动态扩展，扩展栈容量无法申请到足够的内存 。</p><p><strong>注</strong>：HotSpot虚拟机不支持扩展动态扩展栈大小，故栈区域运行时不会因为栈扩展你失败抛出OOM异常，只会因为栈无法容纳新的栈帧而抛出StackOverflowError异常。</p><p>触发StackOverflowError异常：</p><ul><li>方法不断调用自身，递归调用不结束，栈深度增加，栈帧过多</li><li>本地变量过多，导致栈帧过大</li></ul><p>触发OOM异常：</p><ul><li>操作系统给每个进程分配的内存是一定的，不断创建不停止的线程，内存不够新建线程时，抛出OOM异常</li></ul><h4 id="③-方法区和运行时常量池溢出"><a href="#③-方法区和运行时常量池溢出" class="headerlink" title="③ 方法区和运行时常量池溢出"></a>③ 方法区和运行时常量池溢出</h4><p>场景：</p><p><code>String.intern()</code>：（JDK6）将首次遇到的字符串复制到常量池中，（JDK7）不再复制到常量池，将在常量池中存储首次出现实例的引用，若常量池已经有该字符串的引用返回常量池中的引用。intern()方法详解()。</p><ul><li><p>JDK7之前不断添加常量到常量池，限制方法区大小<code>String.valueOf(i++).intern()</code>就会导致运行时常量池OOM异常，并提示PermGen space。<br>JDK7及之后，字符串常量池被移至Java堆，限制方法区大小不会抛出上述异常，这时需要限制堆的大小。</p></li><li><p>运行时不断生成大量动态类（反射）</p></li></ul><h4 id="④-本机直接内存溢出"><a href="#④-本机直接内存溢出" class="headerlink" title="④  本机直接内存溢出"></a>④  本机直接内存溢出</h4>]]></content>
     
     <summary type="html">
     
@@ -137,36 +136,6 @@
   </entry>
   
   <entry>
-    <title>JVM判断对象是否可回收</title>
-    <link href="https://jwkang99.github.io/posts/d51b6e9c.html"/>
-    <id>https://jwkang99.github.io/posts/d51b6e9c.html</id>
-    <published>2021-05-16T02:02:48.000Z</published>
-    <updated>2021-06-11T14:11:36.078Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="判断对象是否可回收"><a href="#判断对象是否可回收" class="headerlink" title="判断对象是否可回收"></a>判断对象是否可回收</h2><h3 id="1-引用计数法"><a href="#1-引用计数法" class="headerlink" title="1 引用计数法"></a>1 引用计数法</h3><p>给每个对象添加一个<strong>引用计数器</strong>，每当一个地方引用它，计数器加1，失效就减1。任何时刻计数器为0的对象就是不可能在被使用的对象，说明该对象已死。</p><p>引用计数法实现简单，效率高。但是很难解决对象互相循环引用的问题。</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">java</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Object A = <span class="keyword">new</span> Object();</span><br><span class="line">Object B = <span class="keyword">new</span> Object();</span><br><span class="line">A.prop1 = B;</span><br><span class="line">B.prop1 = A;</span><br><span class="line">A=<span class="keyword">null</span>;</span><br><span class="line">B=<span class="keyword">null</span>;</span><br></pre></td></tr></table></figure></div><p>上述例子若采用引用计数法，即使A,B对象占用的内存区域用不到了，A,B对象永远无法回收，因为计数器为1。</p><h3 id="2-可达性分析算法"><a href="#2-可达性分析算法" class="headerlink" title="2 可达性分析算法"></a>2 可达性分析算法</h3><p>主流的商用程序语言主要使用的是<strong>可达性分析算法</strong>。</p><p>可达性分析算法是从一系列称为<strong>GC Roots</strong>的对象做为起点，开始搜索，走过的路径称为<strong>引用链</strong>，当一个对象到GC Roots没有任何引用链时，则该对象不可用，可以回收。</p><h4 id="GC-Roots"><a href="#GC-Roots" class="headerlink" title="GC Roots"></a>GC Roots</h4><p>GC Roots主要在全局性的引用（常量和静态变量）和执行上下文（栈帧的本变量表）中。分为两类，一类是<strong>生命周期很长</strong>的对象比如说类的静态变量，另一类是<strong>一定是有用的对象</strong>比如说栈帧的局部变量，这里代表了程序正在执行的地方，这里应用的对象一定是不能被回收的。Java可以作为GC Roots的对象包括下边几种：</p><p>① 虚拟机栈（栈帧中的本地变量表）中引用的对象，譬如各个线程被调用的方法堆栈中使用到的参数、局部变量、临时变量等。<br>② 方法区中<strong>类静态属性</strong>引用的对象，譬如Java类的<strong>引用类型</strong>静态变量。<br>③ 方法区中<strong>常量</strong>引用的对象，譬如<strong>字符串常量池</strong>（String Table）里的引用<br>④ 本地方法栈中JNI（即一般说的Native方法）引用的对象。<br>⑤ Java虚拟机内部的引用，如基本类型数据对应的Class对象，一些常驻的异常对象，类加载器等。<br>⑥ 所有被同步锁（synchronized关键字）持有的对象。</p><p>除了这些固定的GC Roots集合以外，根据用户所选用的垃圾收集器以及当前回收的内存区域不同，还可以有其他对象“<strong>临时性</strong>”地加入，共同构成完整GC Roots集合。举例：。。。</p><h3 id="3-引用类型"><a href="#3-引用类型" class="headerlink" title="3 引用类型"></a>3 引用类型</h3><p>上述两种方法都和引用有关，在JDK 1.2版之前，Java里面的引用是很传统的定义，只有“被引用”或者“未被引用”两种状态。</p><p>我们希望能描述一类对象：当内存空间还足够时，能保留在内存之中，如果内存空间在进行垃圾收集后仍然非常紧张，那就可以抛弃这些对象，在很多系统的<strong>缓存功能</strong>都符合这样的应用场景。</p><p>在JDK 1.2版之后，Java对引用的概念进行了扩充，将引用分为<strong>强引用</strong>（Strongly Reference）、<strong>软引用</strong>（Soft Reference）、<strong>弱引用</strong>（Weak Reference）和<strong>虚引用</strong>（Phantom Reference）4种，这4种引用强度依次逐渐减弱。</p><ul><li><strong>强引用</strong>：最传统的引用的定义，是指直接引用赋值，类似<code>Object obj = new Object()</code>，只要强引用存在，GC就<strong>永远不会回收</strong>被引用的对象。</li><li><strong>软引用</strong>：描述一些还<strong>有用但非必需</strong>的对象。对于软引用关联的对象，<strong>在内存足够的时候，软引用对象不会被回收</strong>，在系统要发生内存溢出异常之前，将会把这些对象放入回收范围内进行第二次回收。如果这次回收hi没有足够内存，抛出OOM异常。</li><li><strong>弱引用</strong>：也用来描述<strong>非必需</strong>的对象，但强度比软引用更弱，弱引用的对象只能<strong>存活到下一次GC发生之前</strong>，垃圾收集器工作时，无论内存是否足够，只被弱引用的对象都要被回收。</li><li><strong>虚引用</strong>：<strong>最弱</strong>的引用关系，一个对象是否有虚引用，完全不会影响其生存时间，也无法通过虚引用取得一个对象实例。为一个对象设置虚引用的目的就是<strong>能在这个对象被回收时收到一个系统通知</strong>。</li></ul><h3 id="4-对象是否真的死亡"><a href="#4-对象是否真的死亡" class="headerlink" title="4 对象是否真的死亡"></a>4 对象是否真的死亡</h3><p>即使在可达性分析算法中不可达的对象，也<strong>不是非死不可</strong>，要真正宣告一个对象死亡，<strong>至少经过两次标记</strong>。</p><p>标记过程：如果没有从GC Roots到对象的引用链，就进行<strong>第一次标记</strong>，如果该对象<strong>覆盖</strong>了finalize()方法并且finalize()<strong>没被虚拟机执行</strong>过（满足这俩条件则有必要执行该对象的finalize方法），将该对象放在F-Queue队列中。稍后虚拟机<strong>启动一个线程</strong>触发队列中对象的finalize方法，随后GC将对F-Queue中的对象进行<strong>第二次标记</strong>，如果某对象在finalize方法里拯救了自己（即重新添加了引用），则不会标记该对象，并将其移除即将回收集合；否则，就要真的被回收了。</p><p><strong>注</strong>：finalize方法只能自动调用一次，也就是只能自救一次。</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h2 id=&quot;判断对象是否可回收&quot;&gt;&lt;a href=&quot;#判断对象是否可回收&quot; class=&quot;headerlink&quot; title=&quot;判断对象是否可回收&quot;&gt;&lt;/a&gt;判断对象是否可回收&lt;/h2&gt;&lt;h3 id=&quot;1-引用计数法&quot;&gt;&lt;a href=&quot;#1-引用计数法&quot; class=&quot;he
-      
-    
-    </summary>
-    
-    
-      <category term="jvm" scheme="https://jwkang99.github.io/categories/jvm/"/>
-    
-    
-      <category term="jvm" scheme="https://jwkang99.github.io/tags/jvm/"/>
-    
-      <category term="GC" scheme="https://jwkang99.github.io/tags/GC/"/>
-    
-      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
-    
-  </entry>
-  
-  <entry>
     <title>Minor/Major/Full GC</title>
     <link href="https://jwkang99.github.io/posts/13c7dd67.html"/>
     <id>https://jwkang99.github.io/posts/13c7dd67.html</id>
@@ -198,19 +167,20 @@
   </entry>
   
   <entry>
-    <title>JVM垃圾回收算法</title>
-    <link href="https://jwkang99.github.io/posts/82902146.html"/>
-    <id>https://jwkang99.github.io/posts/82902146.html</id>
+    <title>JVM垃圾回收和内存分配策略</title>
+    <link href="https://jwkang99.github.io/posts/566ec62f.html"/>
+    <id>https://jwkang99.github.io/posts/566ec62f.html</id>
     <published>2021-05-16T02:02:48.000Z</published>
-    <updated>2021-06-21T08:35:59.223Z</updated>
+    <updated>2021-06-21T13:27:28.370Z</updated>
     
-    <content type="html"><![CDATA[<h3 id="1-标记-清除算法"><a href="#1-标记-清除算法" class="headerlink" title="1 标记-清除算法"></a>1 标记-清除算法</h3><p>标记出需要回收的对象，完成标记后统一回收。效率不高，容易出产生碎片，会导致触发多次GC。</p><h3 id="2-复制算法"><a href="#2-复制算法" class="headerlink" title="2 复制算法"></a>2 复制算法</h3><p>把内存容量分为相同的两部分，每次只使用其中的一半，触发GC时将存活的对象放在另外一半上，再把另一半完全清理了，<strong>不会产生碎片</strong>，代价是<strong>缩小了可用内存</strong>。</p><p>因为<strong>新生代</strong>98%的对象朝生夕死，所以不需要1:1划分，而是分成一块较大的Eden区和两块大小相等的Survivor区，比例为8:1:1，只使用Eden和一块Survivor区采用复制算法，这样只有10%的内存被浪费了。当然也不能保证每次GC中存活的对象都不超过10%，所以就需要老年代的内存做<strong>分配担保</strong>，也就是老年代给新生代擦屁股。</p><p>复制算法在对象存活率较高时就需要进行<strong>较多复制操作</strong>，<strong>效率就会变低</strong>。而且复制算法需要额外内存进行担保，所以老年代不用复制算法。</p><h3 id="3-标记-整理算法"><a href="#3-标记-整理算法" class="headerlink" title="3 标记-整理算法"></a>3 标记-整理算法</h3><p>标记之后将存活的对象移到一端，然后直接清除掉边界之外的内存。</p><h3 id="4-分代收集算法"><a href="#4-分代收集算法" class="headerlink" title="4 分代收集算法"></a>4 分代收集算法</h3><p>根据存活周期不同，分代收集。<strong>新生代</strong>复制算法，<strong>老年代</strong>没有额外空间担保标记-清除或者标记-整理算法。</p><h3 id="5-HotSpot的上述算法实现"><a href="#5-HotSpot的上述算法实现" class="headerlink" title="5 HotSpot的上述算法实现"></a>5 HotSpot的上述算法实现</h3><h4 id="GC-Roots枚举"><a href="#GC-Roots枚举" class="headerlink" title="GC Roots枚举"></a>GC Roots枚举</h4><p>GC Roots主要在全局性的引用（常量和静态变量）和执行上下文（栈帧的本变量表）中，<strong>逐个检查必然会消耗很多时间</strong>。</p><p>可达性分析时必须在一个<strong>确保一致性的快照</strong>中进行，获取快照将导致<strong>用户线程暂停</strong>（Stop The World）。</p><p>HotSpot使用<strong>准确式GC</strong>，系统停顿之后不需要一个不漏的检查所有全局性引用和执行上下文，通过<strong>OopMap（还不太理解？）</strong>的数据结构直接得知哪些地方存着对象引用。在类加载完之后，就把对象内什么偏移量上是什么类型的数据计算出来。在JIT编译过程中，也会在特定位置记录栈和寄存器中哪些位置是引用。</p><p>因此GC在扫描时就可以快速准确的完成GC Roots枚举。</p><h4 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h4><p>再看看</p>]]></content>
+    <content type="html"><![CDATA[<p>java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。</p><p><strong>程序计数器、本地方法栈、虚拟机栈</strong>是<strong>线程</strong>私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作，每一个栈帧分配多少内存基本上是再类结构确定下来时就已知，因此这几个区域的内存分配和回收具备确定性，就不需要过多考虑回收的问题，因为方法结束或者线程结束，内存自然就回收了。</p><p><strong>Java堆和方法区</strong>不一样，是所有线程共享的区域，一个接口的多个实现类所需内存可能不一样，一个方法的多个分支需要的内存可能不一样只有程序在运行时才能知道会创建哪些对象，这部分内存分配和回收都是动态的，垃圾回收关注的也是这部分内存。</p><p>① <a href="./d51b6e9c.html">判断对象是否可回收</a></p><p>② <a href="82902146.html">垃圾回收算法</a></p><p>③ <a href="./b38f68fb.html">垃圾收集器</a></p><p>④ <a href="./13c7dd67.html">内存分配和回收策略</a></p><p><strong>方法区垃圾回收</strong>单独拿出来说：</p><p>方法区（HotSpot虚拟机中的永久代）的垃圾回收在JVM没做要求，因为在永久代中回收效率太低。</p><p>永久代主要回收两部分：废弃<strong>常量</strong>和无用的<strong>类</strong>。</p><p><strong>废弃常量回收</strong>和java堆中的回收类似，如果没有任何String类型对象引用常量池中的字符串<code>abc</code>，有必要的话会清理这个字符串常量。</p><p><strong>无用类</strong>回收需满足三个条件，但并不一定会被回收，有参数进行控制</p><p>① 该类所有实例都被回收<br>② 加载该类的ClassLoader已经被回收<br>③ 该类的Class对象没被引用，没有地方通过反射访问该类的方法</p>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;h3 id=&quot;1-标记-清除算法&quot;&gt;&lt;a href=&quot;#1-标记-清除算法&quot; class=&quot;headerlink&quot; title=&quot;1 标记-清除算法&quot;&gt;&lt;/a&gt;1 标记-清除算法&lt;/h3&gt;&lt;p&gt;标记出需要回收的对象，完成标记后统一回收。效率不高，容易出产生碎片，会导致触发多次G
+        &lt;p&gt;java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;程序计数器、本地方法栈、虚拟机栈&lt;/strong&gt;是&lt;strong&gt;线程&lt;/strong&gt;私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作
       
     
     </summary>
@@ -228,20 +198,49 @@
   </entry>
   
   <entry>
-    <title>JVM垃圾回收和内存分配策略</title>
-    <link href="https://jwkang99.github.io/posts/566ec62f.html"/>
-    <id>https://jwkang99.github.io/posts/566ec62f.html</id>
+    <title>JVM判断对象是否可回收</title>
+    <link href="https://jwkang99.github.io/posts/d51b6e9c.html"/>
+    <id>https://jwkang99.github.io/posts/d51b6e9c.html</id>
     <published>2021-05-16T02:02:48.000Z</published>
-    <updated>2021-06-21T13:27:28.370Z</updated>
+    <updated>2021-06-11T14:11:36.078Z</updated>
     
-    <content type="html"><![CDATA[<p>java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。</p><p><strong>程序计数器、本地方法栈、虚拟机栈</strong>是<strong>线程</strong>私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作，每一个栈帧分配多少内存基本上是再类结构确定下来时就已知，因此这几个区域的内存分配和回收具备确定性，就不需要过多考虑回收的问题，因为方法结束或者线程结束，内存自然就回收了。</p><p><strong>Java堆和方法区</strong>不一样，是所有线程共享的区域，一个接口的多个实现类所需内存可能不一样，一个方法的多个分支需要的内存可能不一样只有程序在运行时才能知道会创建哪些对象，这部分内存分配和回收都是动态的，垃圾回收关注的也是这部分内存。</p><p>① <a href="./d51b6e9c.html">判断对象是否可回收</a></p><p>② <a href="82902146.html">垃圾回收算法</a></p><p>③ <a href="./b38f68fb.html">垃圾收集器</a></p><p>④ <a href="./13c7dd67.html">内存分配和回收策略</a></p><p><strong>方法区垃圾回收</strong>单独拿出来说：</p><p>方法区（HotSpot虚拟机中的永久代）的垃圾回收在JVM没做要求，因为在永久代中回收效率太低。</p><p>永久代主要回收两部分：废弃<strong>常量</strong>和无用的<strong>类</strong>。</p><p><strong>废弃常量回收</strong>和java堆中的回收类似，如果没有任何String类型对象引用常量池中的字符串<code>abc</code>，有必要的话会清理这个字符串常量。</p><p><strong>无用类</strong>回收需满足三个条件，但并不一定会被回收，有参数进行控制</p><p>① 该类所有实例都被回收<br>② 加载该类的ClassLoader已经被回收<br>③ 该类的Class对象没被引用，没有地方通过反射访问该类的方法</p>]]></content>
+    <content type="html"><![CDATA[<h2 id="判断对象是否可回收"><a href="#判断对象是否可回收" class="headerlink" title="判断对象是否可回收"></a>判断对象是否可回收</h2><h3 id="1-引用计数法"><a href="#1-引用计数法" class="headerlink" title="1 引用计数法"></a>1 引用计数法</h3><p>给每个对象添加一个<strong>引用计数器</strong>，每当一个地方引用它，计数器加1，失效就减1。任何时刻计数器为0的对象就是不可能在被使用的对象，说明该对象已死。</p><p>引用计数法实现简单，效率高。但是很难解决对象互相循环引用的问题。</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">java</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Object A = <span class="keyword">new</span> Object();</span><br><span class="line">Object B = <span class="keyword">new</span> Object();</span><br><span class="line">A.prop1 = B;</span><br><span class="line">B.prop1 = A;</span><br><span class="line">A=<span class="keyword">null</span>;</span><br><span class="line">B=<span class="keyword">null</span>;</span><br></pre></td></tr></table></figure></div><p>上述例子若采用引用计数法，即使A,B对象占用的内存区域用不到了，A,B对象永远无法回收，因为计数器为1。</p><h3 id="2-可达性分析算法"><a href="#2-可达性分析算法" class="headerlink" title="2 可达性分析算法"></a>2 可达性分析算法</h3><p>主流的商用程序语言主要使用的是<strong>可达性分析算法</strong>。</p><p>可达性分析算法是从一系列称为<strong>GC Roots</strong>的对象做为起点，开始搜索，走过的路径称为<strong>引用链</strong>，当一个对象到GC Roots没有任何引用链时，则该对象不可用，可以回收。</p><h4 id="GC-Roots"><a href="#GC-Roots" class="headerlink" title="GC Roots"></a>GC Roots</h4><p>GC Roots主要在全局性的引用（常量和静态变量）和执行上下文（栈帧的本变量表）中。分为两类，一类是<strong>生命周期很长</strong>的对象比如说类的静态变量，另一类是<strong>一定是有用的对象</strong>比如说栈帧的局部变量，这里代表了程序正在执行的地方，这里应用的对象一定是不能被回收的。Java可以作为GC Roots的对象包括下边几种：</p><p>① 虚拟机栈（栈帧中的本地变量表）中引用的对象，譬如各个线程被调用的方法堆栈中使用到的参数、局部变量、临时变量等。<br>② 方法区中<strong>类静态属性</strong>引用的对象，譬如Java类的<strong>引用类型</strong>静态变量。<br>③ 方法区中<strong>常量</strong>引用的对象，譬如<strong>字符串常量池</strong>（String Table）里的引用<br>④ 本地方法栈中JNI（即一般说的Native方法）引用的对象。<br>⑤ Java虚拟机内部的引用，如基本类型数据对应的Class对象，一些常驻的异常对象，类加载器等。<br>⑥ 所有被同步锁（synchronized关键字）持有的对象。</p><p>除了这些固定的GC Roots集合以外，根据用户所选用的垃圾收集器以及当前回收的内存区域不同，还可以有其他对象“<strong>临时性</strong>”地加入，共同构成完整GC Roots集合。举例：。。。</p><h3 id="3-引用类型"><a href="#3-引用类型" class="headerlink" title="3 引用类型"></a>3 引用类型</h3><p>上述两种方法都和引用有关，在JDK 1.2版之前，Java里面的引用是很传统的定义，只有“被引用”或者“未被引用”两种状态。</p><p>我们希望能描述一类对象：当内存空间还足够时，能保留在内存之中，如果内存空间在进行垃圾收集后仍然非常紧张，那就可以抛弃这些对象，在很多系统的<strong>缓存功能</strong>都符合这样的应用场景。</p><p>在JDK 1.2版之后，Java对引用的概念进行了扩充，将引用分为<strong>强引用</strong>（Strongly Reference）、<strong>软引用</strong>（Soft Reference）、<strong>弱引用</strong>（Weak Reference）和<strong>虚引用</strong>（Phantom Reference）4种，这4种引用强度依次逐渐减弱。</p><ul><li><strong>强引用</strong>：最传统的引用的定义，是指直接引用赋值，类似<code>Object obj = new Object()</code>，只要强引用存在，GC就<strong>永远不会回收</strong>被引用的对象。</li><li><strong>软引用</strong>：描述一些还<strong>有用但非必需</strong>的对象。对于软引用关联的对象，<strong>在内存足够的时候，软引用对象不会被回收</strong>，在系统要发生内存溢出异常之前，将会把这些对象放入回收范围内进行第二次回收。如果这次回收hi没有足够内存，抛出OOM异常。</li><li><strong>弱引用</strong>：也用来描述<strong>非必需</strong>的对象，但强度比软引用更弱，弱引用的对象只能<strong>存活到下一次GC发生之前</strong>，垃圾收集器工作时，无论内存是否足够，只被弱引用的对象都要被回收。</li><li><strong>虚引用</strong>：<strong>最弱</strong>的引用关系，一个对象是否有虚引用，完全不会影响其生存时间，也无法通过虚引用取得一个对象实例。为一个对象设置虚引用的目的就是<strong>能在这个对象被回收时收到一个系统通知</strong>。</li></ul><h3 id="4-对象是否真的死亡"><a href="#4-对象是否真的死亡" class="headerlink" title="4 对象是否真的死亡"></a>4 对象是否真的死亡</h3><p>即使在可达性分析算法中不可达的对象，也<strong>不是非死不可</strong>，要真正宣告一个对象死亡，<strong>至少经过两次标记</strong>。</p><p>标记过程：如果没有从GC Roots到对象的引用链，就进行<strong>第一次标记</strong>，如果该对象<strong>覆盖</strong>了finalize()方法并且finalize()<strong>没被虚拟机执行</strong>过（满足这俩条件则有必要执行该对象的finalize方法），将该对象放在F-Queue队列中。稍后虚拟机<strong>启动一个线程</strong>触发队列中对象的finalize方法，随后GC将对F-Queue中的对象进行<strong>第二次标记</strong>，如果某对象在finalize方法里拯救了自己（即重新添加了引用），则不会标记该对象，并将其移除即将回收集合；否则，就要真的被回收了。</p><p><strong>注</strong>：finalize方法只能自动调用一次，也就是只能自救一次。</p>]]></content>
     
     <summary type="html">
     
       
       
-        &lt;p&gt;java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;程序计数器、本地方法栈、虚拟机栈&lt;/strong&gt;是&lt;strong&gt;线程&lt;/strong&gt;私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作
+        &lt;h2 id=&quot;判断对象是否可回收&quot;&gt;&lt;a href=&quot;#判断对象是否可回收&quot; class=&quot;headerlink&quot; title=&quot;判断对象是否可回收&quot;&gt;&lt;/a&gt;判断对象是否可回收&lt;/h2&gt;&lt;h3 id=&quot;1-引用计数法&quot;&gt;&lt;a href=&quot;#1-引用计数法&quot; class=&quot;he
+      
+    
+    </summary>
+    
+    
+      <category term="jvm" scheme="https://jwkang99.github.io/categories/jvm/"/>
+    
+    
+      <category term="jvm" scheme="https://jwkang99.github.io/tags/jvm/"/>
+    
+      <category term="GC" scheme="https://jwkang99.github.io/tags/GC/"/>
+    
+      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM垃圾回收算法</title>
+    <link href="https://jwkang99.github.io/posts/82902146.html"/>
+    <id>https://jwkang99.github.io/posts/82902146.html</id>
+    <published>2021-05-16T02:02:48.000Z</published>
+    <updated>2021-06-21T08:35:59.223Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="1-标记-清除算法"><a href="#1-标记-清除算法" class="headerlink" title="1 标记-清除算法"></a>1 标记-清除算法</h3><p>标记出需要回收的对象，完成标记后统一回收。效率不高，容易出产生碎片，会导致触发多次GC。</p><h3 id="2-复制算法"><a href="#2-复制算法" class="headerlink" title="2 复制算法"></a>2 复制算法</h3><p>把内存容量分为相同的两部分，每次只使用其中的一半，触发GC时将存活的对象放在另外一半上，再把另一半完全清理了，<strong>不会产生碎片</strong>，代价是<strong>缩小了可用内存</strong>。</p><p>因为<strong>新生代</strong>98%的对象朝生夕死，所以不需要1:1划分，而是分成一块较大的Eden区和两块大小相等的Survivor区，比例为8:1:1，只使用Eden和一块Survivor区采用复制算法，这样只有10%的内存被浪费了。当然也不能保证每次GC中存活的对象都不超过10%，所以就需要老年代的内存做<strong>分配担保</strong>，也就是老年代给新生代擦屁股。</p><p>复制算法在对象存活率较高时就需要进行<strong>较多复制操作</strong>，<strong>效率就会变低</strong>。而且复制算法需要额外内存进行担保，所以老年代不用复制算法。</p><h3 id="3-标记-整理算法"><a href="#3-标记-整理算法" class="headerlink" title="3 标记-整理算法"></a>3 标记-整理算法</h3><p>标记之后将存活的对象移到一端，然后直接清除掉边界之外的内存。</p><h3 id="4-分代收集算法"><a href="#4-分代收集算法" class="headerlink" title="4 分代收集算法"></a>4 分代收集算法</h3><p>根据存活周期不同，分代收集。<strong>新生代</strong>复制算法，<strong>老年代</strong>没有额外空间担保标记-清除或者标记-整理算法。</p><h3 id="5-HotSpot的上述算法实现"><a href="#5-HotSpot的上述算法实现" class="headerlink" title="5 HotSpot的上述算法实现"></a>5 HotSpot的上述算法实现</h3><h4 id="GC-Roots枚举"><a href="#GC-Roots枚举" class="headerlink" title="GC Roots枚举"></a>GC Roots枚举</h4><p>GC Roots主要在全局性的引用（常量和静态变量）和执行上下文（栈帧的本变量表）中，<strong>逐个检查必然会消耗很多时间</strong>。</p><p>可达性分析时必须在一个<strong>确保一致性的快照</strong>中进行，获取快照将导致<strong>用户线程暂停</strong>（Stop The World）。</p><p>HotSpot使用<strong>准确式GC</strong>，系统停顿之后不需要一个不漏的检查所有全局性引用和执行上下文，通过<strong>OopMap（还不太理解？）</strong>的数据结构直接得知哪些地方存着对象引用。在类加载完之后，就把对象内什么偏移量上是什么类型的数据计算出来。在JIT编译过程中，也会在特定位置记录栈和寄存器中哪些位置是引用。</p><p>因此GC在扫描时就可以快速准确的完成GC Roots枚举。</p><h4 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h4><p>再看看</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;1-标记-清除算法&quot;&gt;&lt;a href=&quot;#1-标记-清除算法&quot; class=&quot;headerlink&quot; title=&quot;1 标记-清除算法&quot;&gt;&lt;/a&gt;1 标记-清除算法&lt;/h3&gt;&lt;p&gt;标记出需要回收的对象，完成标记后统一回收。效率不高，容易出产生碎片，会导致触发多次G
       
     
     </summary>
@@ -314,6 +313,32 @@
       <category term="算法" scheme="https://jwkang99.github.io/tags/%E7%AE%97%E6%B3%95/"/>
     
       <category term="leetcode" scheme="https://jwkang99.github.io/tags/leetcode/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>volatile关键字</title>
+    <link href="https://jwkang99.github.io/posts/111e02e0.html"/>
+    <id>https://jwkang99.github.io/posts/111e02e0.html</id>
+    <published>2020-07-22T03:20:15.000Z</published>
+    <updated>2020-07-22T13:41:40.909Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><h3 id="1-作用"><a href="#1-作用" class="headerlink" title="1.作用"></a>1.作用</h3><h4 id="防止指令重排"><a href="#防止指令重排" class="headerlink" title="防止指令重排"></a>防止指令重排</h4><p>在并发环境下，单例模式的实现方式最多的是使用Double Check的方式，代码如下:</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">java</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//推荐使用</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton_6</span> </span>&#123;</span><br><span class="line">    <span class="comment">//volatile保证instance可见性，禁止指令重排</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Singleton_6 instance;</span><br><span class="line">    <span class="comment">//私有构造函数，禁止外部实例化</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton_6</span><span class="params">()</span></span>&#123;&#125;</span><br><span class="line">    <span class="comment">//doube check</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton_6 <span class="title">getInstance</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(instance == <span class="keyword">null</span>)&#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (Singleton_6<span class="class">.<span class="keyword">class</span>)</span>&#123;</span><br><span class="line">                <span class="keyword">if</span>(instance == <span class="keyword">null</span>)&#123;</span><br><span class="line">                    instance = <span class="keyword">new</span> Singleton_6();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div><p>在上述代码中，new Singleton_6()实例的构造对象可以分为三个步骤：</p><ul><li>分配内存空间</li><li>初始化对象</li><li>将内存空间的地址赋值给对应的引用</li></ul><p>但是由于操作系统为了提高性能可以对指令进行重排序，所以这三个步骤的顺序可能会被打乱。</p><ul><li>分配内存空间</li><li>将内存空间的地址赋值给对应的引用</li><li>初始化对象</li></ul><p>如果是上述的流程，在多线程环境下，就有可能将一个未初始化的对象引用暴露出来，从而导致不可预料的结果。因此为了防止这个过程的重排序，我们需要将变量设置为volatile类型的变量。</p><h4 id="实现可见性"><a href="#实现可见性" class="headerlink" title="实现可见性"></a>实现可见性</h4><p>可见性问题主要是指一个线程修改了共享变量值，但还没有写回到内存中，其他线程却看不到这个变化。如下图所示：</p><p><a href="/posts/111e02e0/volitale.png" data-fancybox="group" data-caption="image-20200301213039998" class="fancybox"><img alt="image-20200301213039998" title="image-20200301213039998" data-src="/posts/111e02e0/volitale.png" class="lazyload"></a></p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">Code</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a &#x3D; 0;  &#x2F;&#x2F;初始状态a &#x3D; b &#x3D; 0，结果允许x &#x3D; y &#x3D; 0出现</span><br><span class="line">b &#x3D; 0;</span><br><span class="line">a &#x3D; 1;  &#x2F;&#x2F;线程A</span><br><span class="line">x &#x3D; b;  &#x2F;&#x2F;线程A</span><br><span class="line">b &#x3D; 2;  &#x2F;&#x2F;线程B</span><br><span class="line">y &#x3D; a;  &#x2F;&#x2F;线程B</span><br></pre></td></tr></table></figure></div><p>这里线程 A 和线程 B 可以同时把共享变量写入自己的写缓冲区（A1，B1），然后从内存中读取另一个共享变量（A2，B2），最后才把自己写缓存区中保存的脏数据刷新到内存中（A3，B3）。当以这种时序执行时，程序就可以得到 x = y = 0 的结果。</p><p>引起可见性问题的主要原因是每个线程拥有自己的一个高速缓存区——线程工作内存。volatile关键字能有效的解决这个问题，<code>volatile</code>变量不会被缓存在寄存器或者对其他处理器不可见的地方，因此在读取<code>volatile</code>类型的变量时总会返回最新写入的值。</p><h4 id="保证原子性"><a href="#保证原子性" class="headerlink" title="保证原子性"></a>保证原子性</h4><p>volatile关键字所保证的原子性是单次读写的原子性。<code>i++</code>是可以分为读写读三个步骤，<code>volatile</code>不能保证<code>i++</code>是原子操作，要保证<code>i++</code>是原子操作，可以使用原子类或者<code>Synchronized</code>。</p><p>同时，因为long和double两种数据类型的操作可分为高32位和低32位两部分，因此普通的long或double类型读/写可能不是原子的。因此，鼓励大家将共享的long和double变量设置为volatile类型，这样能保证任何情况下对long和double的单次读/写操作都具有原子性。</p><h3 id="2-实现原理"><a href="#2-实现原理" class="headerlink" title="2.实现原理"></a>2.实现原理</h3><h4 id="可见性实现"><a href="#可见性实现" class="headerlink" title="可见性实现"></a>可见性实现</h4><blockquote><p>volatile变量的内存可见性是基于内存屏障（Memory Barrier）实现的</p></blockquote><p>内存屏障是一个CPU指令。<br>在程序运行时，为了提高性能，编译器和处理器会对指令进行重排序，JMM为了保证在不同的编译器和CPU上有相同的结果，通过插入特定类型的内存屏障来禁止特定类型的编译器重排序和处理器重排序，插入一条内存屏障会告诉编译器和CPU：不管什么指令都不能和这题奥Memory Barrier指令重排序。</p><p>如下代码：</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">java</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Test</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> a;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        a = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Test test = <span class="keyword">new</span> Test();</span><br><span class="line">        test.update();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div><p>通过 hsdis 和 jitwatch 工具可以得到编译后的汇编代码:</p><div class="code-area-wrap"><div class="highlight-tools"><i class="fa fa-angle-down code-expand" aria-hidden="true"></i><div class="code_lang">sh</div><div class="copy-notice"></div><i class="fa fa-clipboard" aria-hidden="true"></i></div><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">......</span><br><span class="line">  0x0000000002951563: and    <span class="variable">$0xffffffffffffff87</span>,%rdi</span><br><span class="line">  0x0000000002951567: je     0x00000000029515f8</span><br><span class="line">  0x000000000295156d: <span class="built_in">test</span>   <span class="variable">$0x7</span>,%rdi</span><br><span class="line">  0x0000000002951574: jne    0x00000000029515bd</span><br><span class="line">  0x0000000002951576: <span class="built_in">test</span>   <span class="variable">$0x300</span>,%rdi</span><br><span class="line">  0x000000000295157d: jne    0x000000000295159c</span><br><span class="line">  0x000000000295157f: and    <span class="variable">$0x37f</span>,%rax</span><br><span class="line">  0x0000000002951586: mov    %rax,%rdi</span><br><span class="line">  0x0000000002951589: or     %r15,%rdi</span><br><span class="line">  //在 volatile 修饰的共享变量进行写操作的时候会多出 lock 前缀的指令</span><br><span class="line">  0x000000000295158c: lock cmpxchg %rdi,(%rdx)  </span><br><span class="line">  0x0000000002951591: jne    0x0000000002951a15</span><br><span class="line">  0x0000000002951597: jmpq   0x00000000029515f8</span><br><span class="line">  0x000000000295159c: mov    0x8(%rdx),%edi</span><br><span class="line">  0x000000000295159f: shl    <span class="variable">$0x3</span>,%rdi</span><br><span class="line">  0x00000000029515a3: mov    0xa8(%rdi),%rdi</span><br><span class="line">  0x00000000029515aa: or     %r15,%rdi</span><br><span class="line">......</span><br></pre></td></tr></table></figure></div><p>为了提高处理速度，处理器不直接和内存进行通信，而是先将系统内存的数据读到内部缓存(L1，L2 或其他)后再进行操作，但操作完不知道何时会写到内存。</p><p>lock 前缀的指令在多核处理器下会引发两件事情:</p><ul><li>将当前处理器缓存行的数据写回到系统内存。</li><li>写回内存的操作会使在其他 CPU 里缓存了该内存地址的数据无效。</li></ul><p>如果对声明了 volatile 的变量进行写操作，JVM 就会向处理器发送一条 lock 前缀的指令，将这个变量所在缓存行的数据写回到系统内存。</p><p>为了保证各个处理器的缓存是一致的，实现了缓存一致性协议(MESI)，每个处理器通过嗅探在总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，当处理器对这个数据进行修改操作的时候，会重新从系统内存中把数据读到处理器缓存里。</p><p>所有多核处理器下还会完成：当处理器发现本地缓存失效后，就会从内存中重读该变量数据，即可以获取当前最新值。</p><p>volatile 变量通过这样的机制就使得每个线程都能获得该变量的最新值。</p><h4 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h4><p><strong>volatile 的 happens-before 关系</strong></p><p>happens-before 规则中有一条是 volatile 变量规则：对一个 volatile 域的写，happens-before 于任意后续对这个 volatile 域的读。</p><p><strong>volatile 禁止重排序</strong></p><p>为了性能优化，JMM 在不改变正确语义的前提下，会允许编译器和处理器对指令序列进行重排序。JMM 提供了内存屏障阻止这种重排序。</p><p>Java 编译器会在生成指令系列时在适当的位置会插入内存屏障指令来禁止特定类型的处理器重排序。</p><p>JMM 会针对编译器制定 volatile 重排序规则表。</p><p><a href="/posts/111e02e0/java-thread-x-key-volatile-2.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img data-src="/posts/111e02e0/java-thread-x-key-volatile-2.png" class="lazyload"></a></p><p>为了实现 volatile 内存语义时，编译器在生成字节码时，会在指令序列中插入内存屏障来禁止特定类型的处理器重排序。</p><p>对于编译器来说，发现一个最优布置来最小化插入屏障的总数几乎是不可能的，为此，JMM 采取了保守的策略。</p><ul><li>在每个 volatile 写操作的前面插入一个 StoreStore 屏障。</li><li>在每个 volatile 写操作的后面插入一个 StoreLoad 屏障。</li><li>在每个 volatile 读操作的后面插入一个 LoadLoad 屏障。</li><li>在每个 volatile 读操作的后面插入一个 LoadStore 屏障。</li></ul><p>volatile 写是在前面和后面分别插入内存屏障，而 volatile 读操作是在后面插入两个内存屏障。</p><p><a href="/posts/111e02e0/mb.png" data-fancybox="group" data-caption="undefined" class="fancybox"><img style="zoom:50%;" data-src="/posts/111e02e0/mb.png" class="lazyload"></a></p><p><a href="/posts/111e02e0/java-thread-x-key-volatile-3.png" data-fancybox="group" data-caption="volitale" class="fancybox"><img alt="volitale" style="zoom:67%;" title="volitale" data-src="/posts/111e02e0/java-thread-x-key-volatile-3.png" class="lazyload"></a></p><p><a href="/posts/111e02e0/java-thread-x-key-volatile-4.png" data-fancybox="group" data-caption="volitale" class="fancybox"><img alt="volitale" style="zoom:67%;" title="volitale" data-src="/posts/111e02e0/java-thread-x-key-volatile-4.png" class="lazyload"></a></p><h3 id="3-适用场景"><a href="#3-适用场景" class="headerlink" title="3.适用场景"></a>3.适用场景</h3><ul><li>对变量的写操作不依赖于当前值。<ul><li>例如i++操作依赖于i本身</li></ul></li><li>该变量没有包含在具有其他变量的不变式中。<ul><li>由于不能保证原子性，vilatile变量不能保证不变式的成立。</li></ul></li><li>只有在状态真正独立于程序内其他内容时才能使用 volatile。</li></ul><p>参考<a href="https://www.pdai.tech/md/java/thread/java-thread-x-key-synchronized.html" target="_blank" rel="noopener">pdai博客</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;volatile&quot;&gt;&lt;a href=&quot;#volatile&quot; class=&quot;headerlink&quot; title=&quot;volatile&quot;&gt;&lt;/a&gt;volatile&lt;/h2&gt;&lt;h3 id=&quot;1-作用&quot;&gt;&lt;a href=&quot;#1-作用&quot; class=&quot;headerlink&quot; 
+      
+    
+    </summary>
+    
+    
+      <category term="java" scheme="https://jwkang99.github.io/categories/java/"/>
+    
+    
+      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
     
   </entry>
   
@@ -572,29 +597,6 @@
     
     
       <category term="leetcode" scheme="https://jwkang99.github.io/categories/leetcode/"/>
-    
-    
-      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
-    
-      <category term="算法" scheme="https://jwkang99.github.io/tags/%E7%AE%97%E6%B3%95/"/>
-    
-      <category term="leetcode" scheme="https://jwkang99.github.io/tags/leetcode/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>字典树（Trie树）</title>
-    <link href="https://jwkang99.github.io/posts/67cf0c47.html"/>
-    <id>https://jwkang99.github.io/posts/67cf0c47.html</id>
-    <published>2020-06-12T07:02:48.000Z</published>
-    <updated>2021-06-04T13:39:09.630Z</updated>
-    
-    <summary type="html">
-    
-    </summary>
-    
-    
-      <category term="算法" scheme="https://jwkang99.github.io/categories/%E7%AE%97%E6%B3%95/"/>
     
     
       <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
