@@ -194,36 +194,6 @@
   </entry>
   
   <entry>
-    <title>JVM垃圾回收算法</title>
-    <link href="https://jwkang99.github.io/posts/82902146.html"/>
-    <id>https://jwkang99.github.io/posts/82902146.html</id>
-    <published>2021-05-16T02:02:48.000Z</published>
-    <updated>2021-06-21T08:35:59.223Z</updated>
-    
-    <content type="html"><![CDATA[<h3 id="1-标记-清除算法"><a href="#1-标记-清除算法" class="headerlink" title="1 标记-清除算法"></a>1 标记-清除算法</h3><p>标记出需要回收的对象，完成标记后统一回收。效率不高，容易出产生碎片，会导致触发多次GC。</p><h3 id="2-复制算法"><a href="#2-复制算法" class="headerlink" title="2 复制算法"></a>2 复制算法</h3><p>把内存容量分为相同的两部分，每次只使用其中的一半，触发GC时将存活的对象放在另外一半上，再把另一半完全清理了，<strong>不会产生碎片</strong>，代价是<strong>缩小了可用内存</strong>。</p><p>因为<strong>新生代</strong>98%的对象朝生夕死，所以不需要1:1划分，而是分成一块较大的Eden区和两块大小相等的Survivor区，比例为8:1:1，只使用Eden和一块Survivor区采用复制算法，这样只有10%的内存被浪费了。当然也不能保证每次GC中存活的对象都不超过10%，所以就需要老年代的内存做<strong>分配担保</strong>，也就是老年代给新生代擦屁股。</p><p>复制算法在对象存活率较高时就需要进行<strong>较多复制操作</strong>，<strong>效率就会变低</strong>。而且复制算法需要额外内存进行担保，所以老年代不用复制算法。</p><h3 id="3-标记-整理算法"><a href="#3-标记-整理算法" class="headerlink" title="3 标记-整理算法"></a>3 标记-整理算法</h3><p>标记之后将存活的对象移到一端，然后直接清除掉边界之外的内存。</p><h3 id="4-分代收集算法"><a href="#4-分代收集算法" class="headerlink" title="4 分代收集算法"></a>4 分代收集算法</h3><p>根据存活周期不同，分代收集。<strong>新生代</strong>复制算法，<strong>老年代</strong>没有额外空间担保标记-清除或者标记-整理算法。</p><h3 id="5-HotSpot的上述算法实现"><a href="#5-HotSpot的上述算法实现" class="headerlink" title="5 HotSpot的上述算法实现"></a>5 HotSpot的上述算法实现</h3><h4 id="GC-Roots枚举"><a href="#GC-Roots枚举" class="headerlink" title="GC Roots枚举"></a>GC Roots枚举</h4><p>GC Roots主要在全局性的引用（常量和静态变量）和执行上下文（栈帧的本变量表）中，<strong>逐个检查必然会消耗很多时间</strong>。</p><p>可达性分析时必须在一个<strong>确保一致性的快照</strong>中进行，获取快照将导致<strong>用户线程暂停</strong>（Stop The World）。</p><p>HotSpot使用<strong>准确式GC</strong>，系统停顿之后不需要一个不漏的检查所有全局性引用和执行上下文，通过<strong>OopMap（还不太理解？）</strong>的数据结构直接得知哪些地方存着对象引用。在类加载完之后，就把对象内什么偏移量上是什么类型的数据计算出来。在JIT编译过程中，也会在特定位置记录栈和寄存器中哪些位置是引用。</p><p>因此GC在扫描时就可以快速准确的完成GC Roots枚举。</p><h4 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h4><p>再看看</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h3 id=&quot;1-标记-清除算法&quot;&gt;&lt;a href=&quot;#1-标记-清除算法&quot; class=&quot;headerlink&quot; title=&quot;1 标记-清除算法&quot;&gt;&lt;/a&gt;1 标记-清除算法&lt;/h3&gt;&lt;p&gt;标记出需要回收的对象，完成标记后统一回收。效率不高，容易出产生碎片，会导致触发多次G
-      
-    
-    </summary>
-    
-    
-      <category term="jvm" scheme="https://jwkang99.github.io/categories/jvm/"/>
-    
-    
-      <category term="jvm" scheme="https://jwkang99.github.io/tags/jvm/"/>
-    
-      <category term="GC" scheme="https://jwkang99.github.io/tags/GC/"/>
-    
-      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
-    
-  </entry>
-  
-  <entry>
     <title>JVM判断对象是否可回收</title>
     <link href="https://jwkang99.github.io/posts/d51b6e9c.html"/>
     <id>https://jwkang99.github.io/posts/d51b6e9c.html</id>
@@ -268,6 +238,36 @@
       
         &lt;p&gt;java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;程序计数器、本地方法栈、虚拟机栈&lt;/strong&gt;是&lt;strong&gt;线程&lt;/strong&gt;私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作
+      
+    
+    </summary>
+    
+    
+      <category term="jvm" scheme="https://jwkang99.github.io/categories/jvm/"/>
+    
+    
+      <category term="jvm" scheme="https://jwkang99.github.io/tags/jvm/"/>
+    
+      <category term="GC" scheme="https://jwkang99.github.io/tags/GC/"/>
+    
+      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM垃圾回收算法</title>
+    <link href="https://jwkang99.github.io/posts/82902146.html"/>
+    <id>https://jwkang99.github.io/posts/82902146.html</id>
+    <published>2021-05-16T02:02:48.000Z</published>
+    <updated>2021-06-21T08:35:59.223Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="1-标记-清除算法"><a href="#1-标记-清除算法" class="headerlink" title="1 标记-清除算法"></a>1 标记-清除算法</h3><p>标记出需要回收的对象，完成标记后统一回收。效率不高，容易出产生碎片，会导致触发多次GC。</p><h3 id="2-复制算法"><a href="#2-复制算法" class="headerlink" title="2 复制算法"></a>2 复制算法</h3><p>把内存容量分为相同的两部分，每次只使用其中的一半，触发GC时将存活的对象放在另外一半上，再把另一半完全清理了，<strong>不会产生碎片</strong>，代价是<strong>缩小了可用内存</strong>。</p><p>因为<strong>新生代</strong>98%的对象朝生夕死，所以不需要1:1划分，而是分成一块较大的Eden区和两块大小相等的Survivor区，比例为8:1:1，只使用Eden和一块Survivor区采用复制算法，这样只有10%的内存被浪费了。当然也不能保证每次GC中存活的对象都不超过10%，所以就需要老年代的内存做<strong>分配担保</strong>，也就是老年代给新生代擦屁股。</p><p>复制算法在对象存活率较高时就需要进行<strong>较多复制操作</strong>，<strong>效率就会变低</strong>。而且复制算法需要额外内存进行担保，所以老年代不用复制算法。</p><h3 id="3-标记-整理算法"><a href="#3-标记-整理算法" class="headerlink" title="3 标记-整理算法"></a>3 标记-整理算法</h3><p>标记之后将存活的对象移到一端，然后直接清除掉边界之外的内存。</p><h3 id="4-分代收集算法"><a href="#4-分代收集算法" class="headerlink" title="4 分代收集算法"></a>4 分代收集算法</h3><p>根据存活周期不同，分代收集。<strong>新生代</strong>复制算法，<strong>老年代</strong>没有额外空间担保标记-清除或者标记-整理算法。</p><h3 id="5-HotSpot的上述算法实现"><a href="#5-HotSpot的上述算法实现" class="headerlink" title="5 HotSpot的上述算法实现"></a>5 HotSpot的上述算法实现</h3><h4 id="GC-Roots枚举"><a href="#GC-Roots枚举" class="headerlink" title="GC Roots枚举"></a>GC Roots枚举</h4><p>GC Roots主要在全局性的引用（常量和静态变量）和执行上下文（栈帧的本变量表）中，<strong>逐个检查必然会消耗很多时间</strong>。</p><p>可达性分析时必须在一个<strong>确保一致性的快照</strong>中进行，获取快照将导致<strong>用户线程暂停</strong>（Stop The World）。</p><p>HotSpot使用<strong>准确式GC</strong>，系统停顿之后不需要一个不漏的检查所有全局性引用和执行上下文，通过<strong>OopMap（还不太理解？）</strong>的数据结构直接得知哪些地方存着对象引用。在类加载完之后，就把对象内什么偏移量上是什么类型的数据计算出来。在JIT编译过程中，也会在特定位置记录栈和寄存器中哪些位置是引用。</p><p>因此GC在扫描时就可以快速准确的完成GC Roots枚举。</p><h4 id="安全点"><a href="#安全点" class="headerlink" title="安全点"></a>安全点</h4><p>再看看</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;1-标记-清除算法&quot;&gt;&lt;a href=&quot;#1-标记-清除算法&quot; class=&quot;headerlink&quot; title=&quot;1 标记-清除算法&quot;&gt;&lt;/a&gt;1 标记-清除算法&lt;/h3&gt;&lt;p&gt;标记出需要回收的对象，完成标记后统一回收。效率不高，容易出产生碎片，会导致触发多次G
       
     
     </summary>
