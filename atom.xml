@@ -194,6 +194,37 @@
   </entry>
   
   <entry>
+    <title>JVM垃圾回收和内存分配策略</title>
+    <link href="https://jwkang99.github.io/posts/566ec62f.html"/>
+    <id>https://jwkang99.github.io/posts/566ec62f.html</id>
+    <published>2021-05-16T02:02:48.000Z</published>
+    <updated>2021-06-21T13:27:28.370Z</updated>
+    
+    <content type="html"><![CDATA[<p>java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。</p><p><strong>程序计数器、本地方法栈、虚拟机栈</strong>是<strong>线程</strong>私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作，每一个栈帧分配多少内存基本上是再类结构确定下来时就已知，因此这几个区域的内存分配和回收具备确定性，就不需要过多考虑回收的问题，因为方法结束或者线程结束，内存自然就回收了。</p><p><strong>Java堆和方法区</strong>不一样，是所有线程共享的区域，一个接口的多个实现类所需内存可能不一样，一个方法的多个分支需要的内存可能不一样只有程序在运行时才能知道会创建哪些对象，这部分内存分配和回收都是动态的，垃圾回收关注的也是这部分内存。</p><p>① <a href="./d51b6e9c.html">判断对象是否可回收</a></p><p>② <a href="82902146.html">垃圾回收算法</a></p><p>③ <a href="./b38f68fb.html">垃圾收集器</a></p><p>④ <a href="./13c7dd67.html">内存分配和回收策略</a></p><p><strong>方法区垃圾回收</strong>单独拿出来说：</p><p>方法区（HotSpot虚拟机中的永久代）的垃圾回收在JVM没做要求，因为在永久代中回收效率太低。</p><p>永久代主要回收两部分：废弃<strong>常量</strong>和无用的<strong>类</strong>。</p><p><strong>废弃常量回收</strong>和java堆中的回收类似，如果没有任何String类型对象引用常量池中的字符串<code>abc</code>，有必要的话会清理这个字符串常量。</p><p><strong>无用类</strong>回收需满足三个条件，但并不一定会被回收，有参数进行控制</p><p>① 该类所有实例都被回收<br>② 加载该类的ClassLoader已经被回收<br>③ 该类的Class对象没被引用，没有地方通过反射访问该类的方法</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;程序计数器、本地方法栈、虚拟机栈&lt;/strong&gt;是&lt;strong&gt;线程&lt;/strong&gt;私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作
+      
+    
+    </summary>
+    
+    
+      <category term="jvm" scheme="https://jwkang99.github.io/categories/jvm/"/>
+    
+    
+      <category term="jvm" scheme="https://jwkang99.github.io/tags/jvm/"/>
+    
+      <category term="GC" scheme="https://jwkang99.github.io/tags/GC/"/>
+    
+      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
     <title>JVM垃圾回收算法</title>
     <link href="https://jwkang99.github.io/posts/82902146.html"/>
     <id>https://jwkang99.github.io/posts/82902146.html</id>
@@ -237,37 +268,6 @@
       
       
         &lt;h2 id=&quot;判断对象是否可回收&quot;&gt;&lt;a href=&quot;#判断对象是否可回收&quot; class=&quot;headerlink&quot; title=&quot;判断对象是否可回收&quot;&gt;&lt;/a&gt;判断对象是否可回收&lt;/h2&gt;&lt;h3 id=&quot;1-引用计数法&quot;&gt;&lt;a href=&quot;#1-引用计数法&quot; class=&quot;he
-      
-    
-    </summary>
-    
-    
-      <category term="jvm" scheme="https://jwkang99.github.io/categories/jvm/"/>
-    
-    
-      <category term="jvm" scheme="https://jwkang99.github.io/tags/jvm/"/>
-    
-      <category term="GC" scheme="https://jwkang99.github.io/tags/GC/"/>
-    
-      <category term="java" scheme="https://jwkang99.github.io/tags/java/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM垃圾回收和内存分配策略</title>
-    <link href="https://jwkang99.github.io/posts/566ec62f.html"/>
-    <id>https://jwkang99.github.io/posts/566ec62f.html</id>
-    <published>2021-05-16T02:02:48.000Z</published>
-    <updated>2021-06-21T13:27:28.370Z</updated>
-    
-    <content type="html"><![CDATA[<p>java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。</p><p><strong>程序计数器、本地方法栈、虚拟机栈</strong>是<strong>线程</strong>私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作，每一个栈帧分配多少内存基本上是再类结构确定下来时就已知，因此这几个区域的内存分配和回收具备确定性，就不需要过多考虑回收的问题，因为方法结束或者线程结束，内存自然就回收了。</p><p><strong>Java堆和方法区</strong>不一样，是所有线程共享的区域，一个接口的多个实现类所需内存可能不一样，一个方法的多个分支需要的内存可能不一样只有程序在运行时才能知道会创建哪些对象，这部分内存分配和回收都是动态的，垃圾回收关注的也是这部分内存。</p><p>① <a href="./d51b6e9c.html">判断对象是否可回收</a></p><p>② <a href="82902146.html">垃圾回收算法</a></p><p>③ <a href="./b38f68fb.html">垃圾收集器</a></p><p>④ <a href="./13c7dd67.html">内存分配和回收策略</a></p><p><strong>方法区垃圾回收</strong>单独拿出来说：</p><p>方法区（HotSpot虚拟机中的永久代）的垃圾回收在JVM没做要求，因为在永久代中回收效率太低。</p><p>永久代主要回收两部分：废弃<strong>常量</strong>和无用的<strong>类</strong>。</p><p><strong>废弃常量回收</strong>和java堆中的回收类似，如果没有任何String类型对象引用常量池中的字符串<code>abc</code>，有必要的话会清理这个字符串常量。</p><p><strong>无用类</strong>回收需满足三个条件，但并不一定会被回收，有参数进行控制</p><p>① 该类所有实例都被回收<br>② 加载该类的ClassLoader已经被回收<br>③ 该类的Class对象没被引用，没有地方通过反射访问该类的方法</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;java运行时内存包括程序计数器、本地方法栈、虚拟机栈、java堆和方法区。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;程序计数器、本地方法栈、虚拟机栈&lt;/strong&gt;是&lt;strong&gt;线程&lt;/strong&gt;私有的，这三个区域随线程生灭，栈中的栈帧随方法进入退出而进行着出栈入栈的操作
       
     
     </summary>
